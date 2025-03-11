@@ -4,13 +4,41 @@ import ExpensesList from "./ExpensesList";
 import { PALETTE } from "../../utils/theme";
 import ExpensesSummary from "./ExpensesSummary";
 import useExpenses from "../../hooks/useExpenses";
+import { useMemo } from "react";
+import moment from "moment";
+import { EXPENSES } from "../../data/expenses";
 
-function ExpensesOutput({ expensesPeriod }: { expensesPeriod: string }) {
+console.log(moment(EXPENSES[0].date).diff(moment(), "d") <= 7);
+
+function ExpensesOutput({
+  expensesPeriodInDays = 0,
+}: {
+  expensesPeriodInDays?: number;
+}) {
+  const todayInMoment = useMemo(() => moment(), []);
   const { expenses } = useExpenses();
+
+  const periodName = expensesPeriodInDays
+    ? `Last ${expensesPeriodInDays} ${
+        expensesPeriodInDays > 1 ? "days" : "day"
+      }`
+    : "Total";
+
+  const displayedExpenses = useMemo(() => {
+    if (!expensesPeriodInDays) return expenses;
+
+    return expenses.filter((expense) => {
+      return (
+        Math.abs(moment(expense.date).diff(todayInMoment, "days")) <=
+        expensesPeriodInDays
+      );
+    });
+  }, [expensesPeriodInDays, todayInMoment]);
+
   return (
     <View style={styles.container}>
-      <ExpensesSummary expenses={expenses} periodName={expensesPeriod} />
-      <ExpensesList expenses={expenses} />
+      <ExpensesSummary expenses={displayedExpenses} periodName={periodName} />
+      <ExpensesList expenses={displayedExpenses} />
     </View>
   );
 }

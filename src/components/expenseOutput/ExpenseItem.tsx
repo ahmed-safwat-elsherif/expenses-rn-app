@@ -6,7 +6,7 @@ import { Expense } from "../../types/expenses";
 import { useNavigation } from "@react-navigation/native";
 import { ScreenKeys } from "../../routes/definitions";
 
-const getFormattedDate = (data: Date) => moment(data).format("DD/MM/YYYY");
+const getFormattedDate = (data: string) => moment(data).format("YYYY-MM-DD");
 
 interface ExpenseItemProps extends Expense {}
 
