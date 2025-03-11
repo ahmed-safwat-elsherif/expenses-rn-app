@@ -15,6 +15,9 @@ const RootStackNavigation = () => {
       />
       <Stack.Screen
         name={ScreenKeys.MANAGE_EXPENSES}
+        options={{
+          presentation: "modal",
+        }}
         component={ManageExpense}
       />
     </Stack.Navigator>

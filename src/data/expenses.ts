@@ -56,3 +56,8 @@ export const EXPENSES: Expense[] = [
     date: new Date("2022-02-18"),
   },
 ];
+
+export const ExpensesMapper = EXPENSES.reduce((acc, curr) => {
+  acc[curr.id] = curr;
+  return acc;
+}, {} as { [key: Expense["id"]]: Expense });

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Expense } from "../../types/expenses";
 import { PALETTE } from "../../utils/theme";
+import { useMemo } from "react";
 
 function ExpensesSummary({
   expenses,
@@ -10,9 +11,13 @@ function ExpensesSummary({
   expenses: Expense[];
   periodName: string;
 }) {
-  const expensesSum = expenses.reduce((sum, expense) => {
-    return sum + expense.amount;
-  }, 0);
+  const expensesSum = useMemo(
+    () =>
+      expenses.reduce((sum, expense) => {
+        return sum + expense.amount;
+      }, 0),
+    [expenses]
+  );
 
   return (
     <View style={styles.container}>

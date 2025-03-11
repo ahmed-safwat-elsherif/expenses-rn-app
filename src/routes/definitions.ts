@@ -1,4 +1,5 @@
 import { NavigatorScreenParams, RouteProp } from "@react-navigation/native";
+import { Expense } from "../types/expenses";
 
 export enum ScreenKeys {
   MANAGE_EXPENSES = "MANAGE_EXPENSES",
@@ -14,7 +15,7 @@ export type BottomTabsParamList = {
 
 export type RootStackParamList = {
   [ScreenKeys.BOTTOM_TABS_ENTRY]: NavigatorScreenParams<BottomTabsParamList>;
-  [ScreenKeys.MANAGE_EXPENSES]: undefined;
+  [ScreenKeys.MANAGE_EXPENSES]?: { expenseId?: Expense["id"] };
 };
 
 export type UseRouteReturn<TScreenName extends keyof RootStackParamList> =

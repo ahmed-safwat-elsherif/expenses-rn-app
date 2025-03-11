@@ -11,11 +11,11 @@ const getFormattedDate = (data: Date) => moment(data).format("DD/MM/YYYY");
 interface ExpenseItemProps extends Expense {}
 
 const ExpenseItem = (props: ExpenseItemProps) => {
-  const { amount, date, description } = props;
+  const { amount, date, description, id } = props;
   const navigation = useNavigation();
 
   const handleClick = () => {
-    navigation.navigate(ScreenKeys.MANAGE_EXPENSES);
+    navigation.navigate(ScreenKeys.MANAGE_EXPENSES, { expenseId: id });
   };
 
   return (
