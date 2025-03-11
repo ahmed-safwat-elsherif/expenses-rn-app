@@ -7,14 +7,17 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ManageExpense from "../screens/ManageExpense";
 import RecentExpenses from "../screens/RecentExpenses";
 import RootStackNavigation from "../routes/RootStackNavigation";
+import ExpensesProvider from "../providers/ExpensesProvider";
 
 export default function App() {
   return (
     <>
       <StatusBar style="light" />
-      <NavigationContainer>
-        <RootStackNavigation />
-      </NavigationContainer>
+      <ExpensesProvider>
+        <NavigationContainer>
+          <RootStackNavigation />
+        </NavigationContainer>
+      </ExpensesProvider>
     </>
   );
 }

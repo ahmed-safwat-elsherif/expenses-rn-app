@@ -3,13 +3,14 @@ import { StyleSheet, View } from "react-native";
 import ExpensesList from "./ExpensesList";
 import { PALETTE } from "../../utils/theme";
 import ExpensesSummary from "./ExpensesSummary";
-import { EXPENSES } from "../../data/expenses";
+import useExpenses from "../../hooks/useExpenses";
 
 function ExpensesOutput({ expensesPeriod }: { expensesPeriod: string }) {
+  const { expenses } = useExpenses();
   return (
     <View style={styles.container}>
-      <ExpensesSummary expenses={EXPENSES} periodName={expensesPeriod} />
-      <ExpensesList expenses={EXPENSES} />
+      <ExpensesSummary expenses={expenses} periodName={expensesPeriod} />
+      <ExpensesList expenses={expenses} />
     </View>
   );
 }
