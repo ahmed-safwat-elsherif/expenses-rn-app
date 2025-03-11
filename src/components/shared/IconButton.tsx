@@ -10,15 +10,18 @@ import { Ionicons } from "@expo/vector-icons";
 
 type IoniconsProps = React.ComponentProps<typeof Ionicons>;
 
-type IconButtonProps = {
-  onPress: PressableProps["onPress"];
+export type IconButtonProps = {
+  onPress?: PressableProps["onPress"];
 } & Pick<IoniconsProps, "name" | "size" | "color">;
 
 const IconButton = (props: IconButtonProps) => {
   const { onPress, ...rest } = props;
   return (
-    <Pressable onPress={onPress}>
-      <View>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      <View style={styles.buttonContainer}>
         <Ionicons {...rest} />
       </View>
     </Pressable>
@@ -27,4 +30,14 @@ const IconButton = (props: IconButtonProps) => {
 
 export default IconButton;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  buttonContainer: {
+    borderRadius: 24,
+    padding: 6,
+    marginHorizontal: 8,
+    marginVertical: 2,
+  },
+  pressed: {
+    opacity: 0.75,
+  },
+});

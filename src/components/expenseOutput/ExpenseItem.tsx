@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { PALETTE } from "../../utils/theme";
 import moment from "moment";
 import { Expense } from "../../types/expenses";
+import { useNavigation } from "@react-navigation/native";
+import { ScreenKeys } from "../../routes/definitions";
 
 const getFormattedDate = (data: Date) => moment(data).format("DD/MM/YYYY");
 
@@ -10,13 +12,17 @@ interface ExpenseItemProps extends Expense {}
 
 const ExpenseItem = (props: ExpenseItemProps) => {
   const { amount, date, description } = props;
+  const navigation = useNavigation();
 
   const handleClick = () => {
-    console.log(date);
+    navigation.navigate(ScreenKeys.MANAGE_EXPENSES);
   };
 
   return (
-    <Pressable onPress={handleClick}>
+    <Pressable
+      onPress={handleClick}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
       <View style={styles.expenseItem}>
         <View>
           <Text style={[styles.textBase, styles.description]}>
@@ -35,6 +41,9 @@ const ExpenseItem = (props: ExpenseItemProps) => {
 export default ExpenseItem;
 
 const styles = StyleSheet.create({
+  pressed: {
+    opacity: 0.75,
+  },
   expenseItem: {
     padding: 12,
     marginVertical: 8,

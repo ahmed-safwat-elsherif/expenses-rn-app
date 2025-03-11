@@ -4,19 +4,24 @@ import { BottomTabsParamList, ScreenKeys } from "./definitions";
 import RecentExpenses from "../screens/RecentExpenses";
 import ExpensesList from "../screens/ExpensesList";
 import { PALETTE } from "../utils/theme";
+import IconButton from "../components/shared/IconButton";
+import AddExpensesBtn from "../components/shared/AddExpensesBtn";
 
 const BottomTabs = createBottomTabNavigator<BottomTabsParamList>();
 
 const BottomTabsNavigation = () => (
   <BottomTabs.Navigator
-    screenOptions={{
+    screenOptions={({ navigation }) => ({
       headerStyle: {
         backgroundColor: PALETTE.primary500,
       },
       headerTintColor: "white",
       tabBarStyle: { backgroundColor: PALETTE.primary500 },
       tabBarActiveTintColor: PALETTE.accent500,
-    }}
+      headerRight: ({ tintColor }) => (
+        <AddExpensesBtn name="add" size={24} color={tintColor} />
+      ),
+    })}
   >
     <BottomTabs.Screen
       name={ScreenKeys.RECENT_EXPENSES}
