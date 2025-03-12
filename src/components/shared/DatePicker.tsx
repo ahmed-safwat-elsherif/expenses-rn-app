@@ -12,6 +12,8 @@ type DatePickerProps = {
   value: string; // in format YYYYMMDD
   onChange: (date?: string) => void;
   label: string;
+  invalid: boolean;
+  error?: string | false;
 };
 
 const DatePicker = (props: DatePickerProps) => {
@@ -26,7 +28,7 @@ const formateInputDate = (value: string) => {
 };
 
 const DatePickerIOS = (props: DatePickerProps) => {
-  const { value, onChange, label } = props;
+  const { value, onChange, label, invalid, error } = props;
 
   const [date, setDate] = useState(() => formateInputDate(value));
 
@@ -62,8 +64,13 @@ const DatePickerIOS = (props: DatePickerProps) => {
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text style={styles.label}>{label}</Text>
-        <Button onPress={() => setShow(true)}>{buttonLabel}</Button>
+        <Text style={[styles.label, invalid && styles.invalidLabel]}>
+          {label}
+        </Text>
+        <Button error={invalid} onPress={() => setShow(true)}>
+          {buttonLabel}
+        </Button>
+        {error && <Text style={styles.errText}>{error}</Text>}
       </View>
       <Modal
         animationType="fade"
@@ -134,7 +141,7 @@ const DatePickerIOS = (props: DatePickerProps) => {
 export default DatePicker;
 
 const DatePickerAndroid = (props: DatePickerProps) => {
-  const { value, onChange, label } = props;
+  const { value, onChange, label, invalid, error } = props;
   const [date, setDate] = useState(new Date(1598051730000));
 
   const buttonLabel = useMemo(
@@ -167,8 +174,11 @@ const DatePickerAndroid = (props: DatePickerProps) => {
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, invalid && styles.invalidLabel]}>
+          {label}
+        </Text>
         <Button onPress={startDatePicker}>{buttonLabel}</Button>
+        {error && <Text style={styles.errText}>{error}</Text>}
       </View>
     </View>
   );
@@ -188,5 +198,13 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
     marginHorizontal: 8,
+  },
+  invalidLabel: {
+    color: PALETTE.error500,
+  },
+  errText: {
+    marginTop: 2,
+    fontSize: 12,
+    color: PALETTE.error500,
   },
 });

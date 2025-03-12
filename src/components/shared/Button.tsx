@@ -14,11 +14,12 @@ type ButtonProps = PropsWithChildren<{
   onPress?: PressableProps["onPress"];
   mode?: "flat";
   style?: StyleProp<ViewStyle>;
+  error?: boolean;
 }>;
 
-function Button({ children, onPress, mode, style }: ButtonProps) {
+function Button({ children, onPress, mode, style, error }: ButtonProps) {
   return (
-    <View style={style}>
+    <View style={[style, error && styles.buttonError]}>
       <Pressable
         onPress={onPress}
         style={({ pressed }) => pressed && styles.pressed}
@@ -55,5 +56,10 @@ const styles = StyleSheet.create({
     opacity: 0.75,
     backgroundColor: PALETTE.primary100,
     borderRadius: 4,
+  },
+  buttonError: {
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: PALETTE.error500,
   },
 });

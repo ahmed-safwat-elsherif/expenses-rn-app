@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: PALETTE.primary800,
+    backgroundColor: PALETTE.primary700,
   },
   buttons: {
     flexDirection: "row",

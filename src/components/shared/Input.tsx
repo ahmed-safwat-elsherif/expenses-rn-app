@@ -70,7 +70,8 @@ const styles = StyleSheet.create({
     backgroundColor: PALETTE.error50,
   },
   errText: {
-    fontSize: 10,
+    marginTop: 2,
+    fontSize: 12,
     color: PALETTE.error500,
   },
 });

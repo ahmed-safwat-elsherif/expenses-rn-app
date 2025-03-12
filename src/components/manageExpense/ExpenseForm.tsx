@@ -30,7 +30,8 @@ const ExpenseForm = (props: ExpenseFormProps) => {
       description: "",
       ...defaultValues,
       amount: defaultValues?.amount?.toString() ?? "",
-      date: defaultValues?.date ?? today,
+      // date: defaultValues?.date ?? today,
+      // date: defaultValues?.date ?? today,
     },
     mode: "onTouched",
   });
@@ -67,8 +68,16 @@ const ExpenseForm = (props: ExpenseFormProps) => {
           rules={{
             required: true,
           }}
-          render={({ field: { onChange, value } }) => (
-            <DatePicker value={value} onChange={onChange} label="Date" />
+          render={({ field: { onChange, value }, fieldState }) => (
+            <DatePicker
+              value={value}
+              onChange={onChange}
+              label="Date"
+              invalid={fieldState.invalid}
+              error={
+                fieldState.error?.type === "required" && "Item is required"
+              }
+            />
           )}
           name="date"
         />
