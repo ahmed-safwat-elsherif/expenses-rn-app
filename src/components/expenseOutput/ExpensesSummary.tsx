@@ -14,7 +14,7 @@ function ExpensesSummary({
   const expensesSum = useMemo(
     () =>
       expenses.reduce((sum, expense) => {
-        return sum + expense.amount;
+        return sum + (expense.amount as number);
       }, 0),
     [expenses]
   );

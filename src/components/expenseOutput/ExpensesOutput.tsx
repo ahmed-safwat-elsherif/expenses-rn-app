@@ -28,12 +28,10 @@ function ExpensesOutput({
     if (!expensesPeriodInDays) return expenses;
 
     return expenses.filter((expense) => {
-      return (
-        Math.abs(moment(expense.date).diff(todayInMoment, "days")) <=
-        expensesPeriodInDays
-      );
+      const diffDays = moment(expense.date).diff(todayInMoment, "days");
+      return diffDays >= expensesPeriodInDays;
     });
-  }, [expensesPeriodInDays, todayInMoment]);
+  }, [expenses, expensesPeriodInDays, todayInMoment]);
 
   return (
     <View style={styles.container}>

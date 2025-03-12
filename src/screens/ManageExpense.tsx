@@ -1,5 +1,13 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useLayoutEffect } from "react";
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  Touchable,
+  TouchableHighlight,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import React, { useLayoutEffect, useMemo } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, ScreenKeys } from "../routes/definitions";
 import { useNavigation } from "@react-navigation/native";
@@ -7,6 +15,11 @@ import { PALETTE } from "../utils/theme";
 import useExpenses from "../hooks/useExpenses";
 import Button from "../components/shared/Button";
 import IconButton from "../components/shared/IconButton";
+import ExpenseForm, {
+  FormValues,
+} from "../components/manageExpense/ExpenseForm";
+import { ExpensesMapper } from "../data/expenses";
+import { Expense } from "../types/expenses";
 
 interface ManageExpenseProps
   extends NativeStackScreenProps<
@@ -17,8 +30,13 @@ interface ManageExpenseProps
 const ManageExpense = ({ route }: ManageExpenseProps) => {
   const { expenseId } = route.params || {};
   const navigation = useNavigation();
-  const { addExpense, removeExpense, updateExpense } = useExpenses();
+  const { expenses, addExpense, removeExpense, updateExpense } = useExpenses();
   const isEditMode = !!expenseId;
+
+  const activeExpense = useMemo(() => {
+    if (!expenseId) return null;
+    return expenses.find((exp) => exp.id === expenseId);
+  }, [expenseId, expenses]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -35,51 +53,59 @@ const ManageExpense = ({ route }: ManageExpenseProps) => {
     navigation.goBack();
   }
 
-  function confirmHandler() {
+  function confirmHandler(data: Partial<Expense>) {
     if (isEditMode) {
       updateExpense({
+        ...activeExpense,
+        ...data,
+        amount:
+          data.amount && data.amount !== 0
+            ? +data.amount
+            : activeExpense?.amount,
         id: expenseId,
-        description: "Test!!!!",
-        amount: 29.99,
-        date: new Date("2022-05-20"),
       });
     } else {
       addExpense({
-        description: "Test",
-        amount: 19.99,
-        date: new Date("2022-05-19"),
-      });
+        ...data,
+        amount: +(data.amount as string),
+      } as Expense);
     }
     navigation.goBack();
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.buttons}>
-        <Button style={styles.button} mode="flat" onPress={cancelHandler}>
-          Cancel
-        </Button>
-        <Button style={styles.button} onPress={confirmHandler}>
-          {isEditMode ? "Update" : "Add"}
-        </Button>
+    <TouchableWithoutFeedback
+      style={styles.touchable}
+      onPress={() => Keyboard.dismiss()}
+    >
+      <View style={styles.container}>
+        <ExpenseForm
+          onSubmit={confirmHandler}
+          onCancel={cancelHandler}
+          defaultValues={activeExpense as FormValues}
+          submitLabel={isEditMode ? "Save" : "Add"}
+        />
+        {isEditMode && (
+          <View style={styles.deleteContainer}>
+            <IconButton
+              name="trash"
+              color={PALETTE.error500}
+              size={36}
+              onPress={deleteExpenseHandler}
+            />
+          </View>
+        )}
       </View>
-      {isEditMode && (
-        <View style={styles.deleteContainer}>
-          <IconButton
-            name="trash"
-            color={PALETTE.error500}
-            size={36}
-            onPress={deleteExpenseHandler}
-          />
-        </View>
-      )}
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 export default ManageExpense;
 
 const styles = StyleSheet.create({
+  touchable: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 24,

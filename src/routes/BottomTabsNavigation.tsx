@@ -1,27 +1,26 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { BottomTabsParamList, ScreenKeys } from "./definitions";
 import RecentExpenses from "../screens/RecentExpenses";
 import ExpensesList from "../screens/ExpensesList";
 import { PALETTE } from "../utils/theme";
-import IconButton from "../components/shared/IconButton";
 import AddExpensesBtn from "../components/shared/AddExpensesBtn";
 
 const BottomTabs = createBottomTabNavigator<BottomTabsParamList>();
 
 const BottomTabsNavigation = () => (
   <BottomTabs.Navigator
-    screenOptions={({ navigation }) => ({
+    screenOptions={{
       headerStyle: {
         backgroundColor: PALETTE.primary500,
       },
       headerTintColor: "white",
       tabBarStyle: { backgroundColor: PALETTE.primary500 },
-      tabBarActiveTintColor: PALETTE.accent500,
+      tabBarActiveTintColor: "white",
       headerRight: ({ tintColor }) => (
         <AddExpensesBtn name="add" size={24} color={tintColor} />
       ),
-    })}
+    }}
   >
     <BottomTabs.Screen
       name={ScreenKeys.RECENT_EXPENSES}
@@ -30,7 +29,7 @@ const BottomTabsNavigation = () => (
         title: "Recent Expenses",
         tabBarLabel: "Recent",
         tabBarIcon: ({ size, color }) => (
-          <Ionicons name="hourglass" size={size} color={color} />
+          <Ionicons name="time" size={size} color={color} />
         ),
       }}
     />

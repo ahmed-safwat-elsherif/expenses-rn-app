@@ -2,6 +2,7 @@ import React, {
   createContext,
   PropsWithChildren,
   useCallback,
+  useMemo,
   useState,
 } from "react";
 import { Expense } from "../types/expenses";
@@ -23,10 +24,11 @@ export const ExpensesContext = createContext<ExpensesContextValues>({
 });
 
 const ExpensesProvider = ({ children }: PropsWithChildren) => {
-  const [expenses, setExpenses] = useState(EXPENSES);
+  const [expenses, setExpenses] = useState([] as Expense[]);
 
   const addExpense = useCallback<ExpensesContextValues["addExpense"]>(
     (expense) => {
+      console.log("addExpense=>", { expense });
       setExpenses((prev) => [...prev, { ...expense, id: getId() }]);
     },
     []
@@ -41,6 +43,8 @@ const ExpensesProvider = ({ children }: PropsWithChildren) => {
 
   const updateExpense = useCallback<ExpensesContextValues["updateExpense"]>(
     (expense) => {
+      console.log("updateExpense=>", { expense });
+
       setExpenses((prev) =>
         prev.map((item) =>
           item.id === expense.id ? { ...item, ...expense } : item
@@ -50,10 +54,18 @@ const ExpensesProvider = ({ children }: PropsWithChildren) => {
     []
   );
 
+  const ctxValues = useMemo(
+    () => ({
+      expenses,
+      addExpense,
+      removeExpense,
+      updateExpense,
+    }),
+    [expenses, addExpense, removeExpense, updateExpense]
+  );
+
   return (
-    <ExpensesContext.Provider
-      value={{ expenses, addExpense, removeExpense, updateExpense }}
-    >
+    <ExpensesContext.Provider value={ctxValues}>
       {children}
     </ExpensesContext.Provider>
   );
