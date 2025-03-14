@@ -2,18 +2,24 @@ import React, {
   createContext,
   PropsWithChildren,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import { Expense } from "../types/expenses";
 import { EXPENSES } from "../data/expenses";
-import getId from "../utils/getId";
+import * as ExpensesService from "../api/expenses";
 
 export type ExpensesContextValues = {
   expenses: Expense[];
-  addExpense: (expense: Omit<Expense, "id">) => void;
+  addExpense: (expense: Expense) => void;
   removeExpense: (expenseId: Expense["id"]) => void;
-  updateExpense: (expense: { id: Expense["id"] } & Partial<Expense>) => void;
+  updateExpense: (
+    expenseId: Expense["id"],
+    expenseUpdates: Partial<Expense>
+  ) => void;
+  loading: boolean;
+  error: null | string;
 };
 
 export const ExpensesContext = createContext<ExpensesContextValues>({
@@ -21,15 +27,33 @@ export const ExpensesContext = createContext<ExpensesContextValues>({
   addExpense: () => {},
   removeExpense: () => {},
   updateExpense: () => {},
+  loading: true,
+  error: null,
 });
 
 const ExpensesProvider = ({ children }: PropsWithChildren) => {
   const [expenses, setExpenses] = useState([] as Expense[]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<null | string>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    ExpensesService.getExpenses()
+      .then((res) => {
+        setExpenses(res.data);
+      })
+      .catch(() => {
+        setError("Something went wrong!");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const addExpense = useCallback<ExpensesContextValues["addExpense"]>(
     (expense) => {
-      console.log("addExpense=>", { expense });
-      setExpenses((prev) => [...prev, { ...expense, id: getId() }]);
+      setExpenses((prev) => [...prev, expense]);
     },
     []
   );
@@ -42,12 +66,10 @@ const ExpensesProvider = ({ children }: PropsWithChildren) => {
   );
 
   const updateExpense = useCallback<ExpensesContextValues["updateExpense"]>(
-    (expense) => {
-      console.log("updateExpense=>", { expense });
-
+    (expenseId, expenseUpdates) => {
       setExpenses((prev) =>
         prev.map((item) =>
-          item.id === expense.id ? { ...item, ...expense } : item
+          item.id === expenseId ? { ...item, ...expenseUpdates } : item
         )
       );
     },
@@ -60,8 +82,10 @@ const ExpensesProvider = ({ children }: PropsWithChildren) => {
       addExpense,
       removeExpense,
       updateExpense,
+      loading,
+      error,
     }),
-    [expenses, addExpense, removeExpense, updateExpense]
+    [expenses, addExpense, removeExpense, updateExpense, loading, error]
   );
 
   return (

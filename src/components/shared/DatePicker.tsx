@@ -142,17 +142,19 @@ export default DatePicker;
 
 const DatePickerAndroid = (props: DatePickerProps) => {
   const { value, onChange, label, invalid, error } = props;
-  const [date, setDate] = useState(new Date(1598051730000));
+  const [date, setDate] = useState(() => formateInputDate(value));
 
   const buttonLabel = useMemo(
     () => (value ? moment(value).format("YYYY-MM-DD") : "Select Date"),
     [value]
   );
 
-  const handleChange = (_: DateTimePickerEvent, selectedDate?: Date) => {
-    if (selectedDate) {
+  const handleChange = (evt: DateTimePickerEvent, selectedDate?: Date) => {
+    console.log({ selectedDate, "event.type": evt.type });
+
+    if (selectedDate && evt.type !== "dismissed") {
       setDate(selectedDate);
-      onChange(moment(date).format("YYYYMMDD"));
+      onChange(moment(selectedDate).format("YYYYMMDD"));
     }
   };
 

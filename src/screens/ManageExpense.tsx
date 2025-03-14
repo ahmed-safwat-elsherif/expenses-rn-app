@@ -1,24 +1,21 @@
 import {
+  Alert,
   Keyboard,
   StyleSheet,
-  Text,
-  Touchable,
-  TouchableHighlight,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useMemo } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import * as ExpensesService from "../api/expenses";
 import { RootStackParamList, ScreenKeys } from "../routes/definitions";
 import { useNavigation } from "@react-navigation/native";
 import { PALETTE } from "../utils/theme";
 import useExpenses from "../hooks/useExpenses";
-import Button from "../components/shared/Button";
 import IconButton from "../components/shared/IconButton";
 import ExpenseForm, {
   FormValues,
 } from "../components/manageExpense/ExpenseForm";
-import { ExpensesMapper } from "../data/expenses";
 import { Expense } from "../types/expenses";
 
 interface ManageExpenseProps
@@ -28,6 +25,7 @@ interface ManageExpenseProps
   > {}
 
 const ManageExpense = ({ route }: ManageExpenseProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { expenseId } = route.params || {};
   const navigation = useNavigation();
   const { expenses, addExpense, removeExpense, updateExpense } = useExpenses();
@@ -45,31 +43,55 @@ const ManageExpense = ({ route }: ManageExpenseProps) => {
   }, [navigation.setOptions, isEditMode]);
 
   function deleteExpenseHandler() {
+    Alert.alert("Remove Expense", "Do you want to remove expense?", [
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: confirmDeletion,
+      },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  }
+
+  const confirmDeletion = async () => {
+    setIsSubmitting(true);
+    await ExpensesService.deleteExpense(expenseId as string);
     removeExpense(expenseId as string);
     navigation.goBack();
-  }
+    setIsSubmitting(false);
+  };
 
   function cancelHandler() {
     navigation.goBack();
   }
 
-  function confirmHandler(data: Partial<Expense>) {
+  async function confirmHandler(data: Partial<Expense>) {
+    setIsSubmitting(true);
     if (isEditMode) {
-      updateExpense({
-        ...activeExpense,
+      const updates = {
         ...data,
         amount:
           data.amount && data.amount !== 0
             ? +data.amount
             : activeExpense?.amount,
-        id: expenseId,
+      };
+      await ExpensesService.updateExpense(expenseId, updates);
+      updateExpense(expenseId, {
+        ...activeExpense,
+        ...updates,
       });
     } else {
-      addExpense({
+      const expnese = {
         ...data,
         amount: +(data.amount as string),
+      } as Omit<Expense, "id">;
+      const id = await ExpensesService.addExpense(expnese);
+      addExpense({
+        id,
+        ...expnese,
       } as Expense);
     }
+    setIsSubmitting(false);
     navigation.goBack();
   }
 
@@ -84,8 +106,9 @@ const ManageExpense = ({ route }: ManageExpenseProps) => {
           onCancel={cancelHandler}
           defaultValues={activeExpense as FormValues}
           submitLabel={isEditMode ? "Save" : "Add"}
+          loading={isSubmitting}
         />
-        {isEditMode && (
+        {isEditMode && !isSubmitting && (
           <View style={styles.deleteContainer}>
             <IconButton
               name="trash"

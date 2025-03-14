@@ -1,13 +1,10 @@
-import React, { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { Expense } from "../../types/expenses";
 import { Controller, useForm } from "react-hook-form";
 import Input from "../shared/Input";
 import Button from "../shared/Button";
 import DatePicker from "../shared/DatePicker";
-import moment from "moment";
 
 export interface FormValues extends Omit<Expense, "id"> {
   amount: string;
@@ -18,23 +15,24 @@ type ExpenseFormProps = {
   onCancel: () => void;
   submitLabel: string;
   defaultValues?: FormValues | null;
+  loading?: boolean;
 };
 
 const ExpenseForm = (props: ExpenseFormProps) => {
-  const { defaultValues, onCancel, onSubmit, submitLabel } = props;
-
-  const today = useMemo(() => moment().format("YYYYMMDD"), []);
+  const { defaultValues, onCancel, onSubmit, submitLabel, loading } = props;
 
   const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       description: "",
       ...defaultValues,
       amount: defaultValues?.amount?.toString() ?? "",
-      // date: defaultValues?.date ?? today,
-      // date: defaultValues?.date ?? today,
     },
     mode: "onTouched",
   });
+
+  if (loading) {
+    return <ActivityIndicator color="white" size={40} />;
+  }
 
   return (
     <View style={styles.root}>

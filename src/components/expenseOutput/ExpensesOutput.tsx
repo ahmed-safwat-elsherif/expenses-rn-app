@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import ExpensesList from "./ExpensesList";
 import { PALETTE } from "../../utils/theme";
@@ -6,17 +6,14 @@ import ExpensesSummary from "./ExpensesSummary";
 import useExpenses from "../../hooks/useExpenses";
 import { useMemo } from "react";
 import moment from "moment";
-import { EXPENSES } from "../../data/expenses";
 
-console.log(moment(EXPENSES[0].date).diff(moment(), "d") <= 7);
-
-function ExpensesOutput({
-  expensesPeriodInDays = 0,
-}: {
+type ExpensesOutputProps = {
   expensesPeriodInDays?: number;
-}) {
+};
+
+function ExpensesOutput({ expensesPeriodInDays = 0 }: ExpensesOutputProps) {
   const todayInMoment = useMemo(() => moment(), []);
-  const { expenses } = useExpenses();
+  const { expenses, loading, error } = useExpenses();
 
   const periodName = expensesPeriodInDays
     ? `Last ${expensesPeriodInDays} ${
@@ -26,22 +23,47 @@ function ExpensesOutput({
 
   const displayedExpenses = useMemo(() => {
     if (!expensesPeriodInDays) return expenses;
-
     return expenses.filter((expense) => {
-      const diffDays = moment(expense.date).diff(todayInMoment, "days");
-      return diffDays >= expensesPeriodInDays;
+      const diffDays = todayInMoment.diff(moment(expense.date), "days");
+
+      return diffDays <= expensesPeriodInDays;
     });
   }, [expenses, expensesPeriodInDays, todayInMoment]);
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator color="white" size={40} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: 25 }}>😕</Text>
+        <Text style={{ color: PALETTE.error50, fontSize: 18 }}>{error} </Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <>
       <ExpensesSummary expenses={displayedExpenses} periodName={periodName} />
       <ExpensesList expenses={displayedExpenses} />
-    </View>
+    </>
   );
 }
 
-export default ExpensesOutput;
+const ExpensesOutputLayout = (props: ExpensesOutputProps) => {
+  return (
+    <View style={styles.container}>
+      <ExpensesOutput {...props} />
+    </View>
+  );
+};
+
+export default ExpensesOutputLayout;
 
 const styles = StyleSheet.create({
   container: {
